@@ -1,0 +1,114 @@
+TAMAM ULAN ASKER - MOBIL (DOKUNMATIK) KONTROLLER
+=================================================
+
+NE EKLENDI?
+-----------
+Oyuna Baldi's Basics mobil surumundeki tarza uygun dokunmatik kontroller
+eklendi. Yeni kodlar:
+
+  Assets/Scripts/Assembly-CSharp/VirtualInput.cs    (sanal girdi koprusu)
+  Assets/Scripts/Assembly-CSharp/MobileControls.cs  (ekran arayuzu, otomatik acilir)
+  Assets/Scripts/Assembly-CSharp/MobileJoystick.cs  (sanal joystick)
+  Assets/Scripts/Assembly-CSharp/MobileButton.cs    (bas / basili-tut butonu)
+
+Degistirilen mevcut scriptler (sadece mobil girdiler eklendi, PC ayni):
+  PlayerScript.cs, PlayerMovement.cs, CameraScript.cs,
+  GameControllerScript.cs, DoorScript.cs, NotebookScript.cs,
+  EndlessNotebookScript.cs, PickupScript.cs
+
+Kontroller SAHNEYE ELLE EKLENMEZ. MobileControls oyun acilisinda kendini
+olusturur; PlayerScript bulunan sahnelerde (School vb. oyun sahneleri)
+gorunur, menulerde gorunmez. Android/iOS'ta otomatik aktiftir.
+
+KONTROL SEMASI (sag el / sol el)
+---------------------------------
+Sol alt   : Sanal JOYSTICK  -> yurume (WASD / ok tuslari)
+Ekranin sag yarisini surukle -> BAKIS / donme (fare)
+Buyuk mavi buton "AC"        -> ETKILESIM: kapi ac, defter al, esya al
+                                 (PC'deki sol fare tiki; retikül neyi
+                                  gosteriyorsa ona uygulanir)
+"KOS"     (basili tut)       -> kosma (Left Shift). Stamina aynen duser,
+                                 kosarken Principal'in "guilt" sistemi de
+                                 PC'deki gibi isler.
+"KULLAN"                     -> Secili esyayi kullan (sag fare tiki)
+"BAK"     (basili tut)       -> Arkaya bak (Space basili tutma)
+"BAK"     (basip birak)      -> Ip atlama (Playtime) oyununda ZIPLA
+"<" ">"                      -> Esya degistir (fare tekerlegi / 1-5)
+"II" (sag ust)               -> Duraklat (Esc/P). Android geri tusu da
+                                 zaten Esc gonderir, o da ayni islevde.
+Menuler ve matematik (defter/YCTP) ekrani: Normal dokunmayla acilir.
+  Matematik ekraninda hareket kontrolleri gizlenir; sayi tuslari o
+  ekranin kendi butonlaridir, cevap alani tiklaninca mobil klavye acilir.
+
+Telefon yatay tutulur (kod ekrani yataya zorlar), ekran uykuya gecmez.
+
+PC'DE TEST ETMEK ICIN
+---------------------
+1) Projeyi Unity 2019.4.15f1 ile ac, School sahnesini acip Play'e bas.
+2) Konsoldan mobil kontrolleri zorla:
+   - Kucuk bir test scriptiyle PlayerPrefs.SetInt("ForceMobileControls", 1)
+     ayarla ve sahneyi yeniden baslat, ya da
+   - Editorden Edit > Project Settings > Player > ... gerek yok;
+     en pratigi Game sekmesinde "Simulator" gorunumu degil, dogrudan
+     Android Build almaktir (asagida).
+3) Dokunmatik ekranli bir cihazda ilk dokunusta da kontroller acilir
+   (InputTypeManager.usingTouch).
+
+ANDROID BUILD NOTLARI
+---------------------
+1) File > Build Settings > Android sec, "Switch Platform" de.
+   (Ilk seferde Android Build Support modulu gerekir; Unity Hub >
+    Installs > 2019.4.15f1 > Add Modules > Android Build Support +
+    Android SDK & NDK Tools + OpenJDK isaretle.)
+2) Player Settings > Orientation: Default Orientation = Landscape Left
+   (kod zaten yataya zorluyor ama build ayarinda da boyle olsun).
+3) Player Settings > Other Settings > Minimum API Level: Android 5.0+
+4) Build > APK cikart, telefona kur.
+
+NOT: Orijinal projede mobil1/mobile2 diye yarim kalmis Canvas
+referanslari ve calismayan bir MobileController.cs vardi (Start'ta
+kendini kapatiyordu). Yeni sistem onlara dokunmuyor; ayri ve temiz
+calisiyor, istenirse tek klasor silinerek komple kaldirilabilir.
+
+Unity olmadan burada sozdizimi (syntax) kontrolu yapildi; calistirarak
+test Unity editörunde sende. Play'de hata cikarsa Console'un ilk
+kirmizi satirini gonder, duzeltirim.
+
+====================================================================
+GUNCELLEME: GAMEBANANA BALDI KONTROL PAKETI (tools/19220)
+====================================================================
+İstenen paket projeye eklendi ve baglandi:
+
+* Assets/Plugins/Control-Freak-2/  -> paketteki CF2 plugin'i (143 script)
+  Ornek (Samples) sahneler eklenmedi; paketin uyardigi
+  "CF2 Controller Folder" da EKLENMEDI (zaten projede ItemImageScript var,
+  cakisma/bug yapardi).
+* Assets/Resources/BaldiMobile/CF2-Rig.prefab -> paketin kontrol rig'i.
+  Sahneye suruklemeye gerek yok; MobileControls acilista getiriyor.
+  Prefab'in UI script referanslari bizim projenin UnityEngine.UI.dll
+  GUID'lerine cevridi (20 baglanti), yoksa "missing script" cikardi.
+* Oyun scriptleri Input yerine CF2Input okuyor (paketin asil kullanimi):
+  PlayerScript, PlayerMovement, CameraScript, GameControllerScript,
+  DoorScript, NotebookScript, EndlessNotebookScript, PickupScript,
+  IntroTrigger, ClickableTest.
+* Rig tuslari -> oyun eksenleri:
+  Joystick = Forward/Strafe, TrackPad = Mouse X/Y, Run (bacak) = Run,
+  Interaction (el) = Fire1/sol tik, Mirror = Look Behind (+ ip atlama),
+  Pause = Pause, Item0/1/2 = 1/2/3 esya secimi.
+* Pakette olmayanlar MobileControls'un ek butonlari: KULLAN,
+  esya < > oklari (5 yuva icin), duraklatinca cikan II butonu.
+
+TASARIM
+-------
+* Sprint (Run) tusundaki Baldi bacagi KOYU KIZIL yapildi:
+  Assets/Texture2D/All Texture 2D/RunSprite.png
+  (mavi pantolon koyu kizila cevrildi, gölge tonlari korundu)
+* Paket adi: com.vacantguy.tamamulanasker
+  Sirket: Vacant Guy, Surum: 1.1.0 (Version Code 2), Min Android: 5.0 (API21)
+  Yon: yatay (Landscape)
+* Ikon tasarlandi: Assets/AppIcon/ (1024/512/192/180/144/96/72/48/36)
+  Kamuflaj + migfer + yildiz, "TAMAM ULAN ASKER", alt bant bacaktaki
+  koyu kizilla ayni aileden.
+  Unity'de tek tikla uygulamak icin:
+     Ust menu > Tamam Ulan Asker > Mobil Ayarlari Uygula (Ikon + Paket Adi)
+  (Assets/Editor/ApplyMobileSettings.cs)

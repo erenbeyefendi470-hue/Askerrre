@@ -1,0 +1,25 @@
+# Unity
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Ll]ogs/
+[Uu]serSettings/
+*.csproj
+*.sln
+*.user
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# Build ciktilari (APK GitHub Actions artifact olarak gelir)
+Builds/
+[Bb]uild/
+
+# Sistem
+.DS_Store
+Thumbs.db
+.vs/
