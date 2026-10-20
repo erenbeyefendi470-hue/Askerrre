@@ -1,0 +1,85 @@
+TAMAM ULAN ASKER - GERI KAZANILMIS UNITY PROJESI
+==================================================
+
+Bu proje, oyunun hazir PC build'inden (exe + _Data) AssetRipper ile
+geri kazanilarak olusturulmustur. Gelistiricinin orijinal kaynak projesi
+degildir; orijinal proje dosyalari build'in icinde bulunmaz.
+
+ORIJINAL BUILD BILGILERI
+--------------------------
+Oyun          : TAMAM ULAN ASKER (DefaultCompany, v1.0.0)
+Kaynak dosyalar: "TAMAM ULAN ASKER" (64-bit) klasoru kullanildi.
+                 Zip icindeki 32-bit surum ayni oyunun kopyasi oldugu
+                 icin projeye sadece 64-bit surum sokuldu.
+Unity         : 2019.4.15f1  (ProjectSettings/ProjectVersion.txt)
+Scripting     : Mono (IL2CPP degil - bu yuzden kod geri cikarilabildi)
+Toplam sahne  : 14
+
+NASIL ACILIR?
+-------------
+1) Unity Hub'dan TAM OLARAK Unity 2019.4.15f1 surumunu kur.
+   (Baska surumle acarsan asset'ler upgrade olur, bazi seyler bozulabilir.)
+2) Unity Hub > Open > bu klasoru sec (TAMAM_ULAN_ASKER_UnityProject).
+3) Ilk acilis biraz surebilir, Unity Library klasorunu yeniden olusturur.
+4) Assets/Scene/Scenes/Warning.unity sahnesinden basla.
+   Build sirasi: Warning > MainMenu > School > GameOver > Results >
+   Secret > TestRoom > UcluGerizekali > VerseneOLM > BayBasliyoruz >
+   YanMonitor > CemaliKuptir > Dalga > Gomutan
+   (ProjectSettings/EditorBuildSettings.asset icinde kayitli.)
+
+ICINDE NE VAR?
+--------------
+Assets/Scene/Scenes/        14 sahnenin tamami (.unity)
+Assets/Scripts/Assembly-CSharp/  80 adet decompile edilmis C# scripti
+   (BaldiScript, PlayerScript, GameControllerScript, MathGameScript,
+    PrincipalScript, SweepScript, PlaytimeScript vb. - oyun Baldi's
+    Basics mekanikleri uzerine kurulu bir reskin/mod.)
+Assets/Texture2D/ + Sprite/  ~600 PNG
+Assets/AudioClip/             132 OGG ses/muzik
+Assets/Material/              82 materyal
+Assets/Mesh/, AnimationClip/, AnimatorController/, Font/, VideoClip/
+Assets/StreamingAssets/       "otistik kel.mp4" vb.
+ProjectSettings/              InputManager, TagManager, PlayerSettings,
+                              QualitySettings dahil geri kazanildi.
+Assets/Plugins/               Unity.TextMeshPro.dll, UnityEngine.UI.dll,
+                              Unity.Timeline.dll (paket yerine DLL olarak)
+
+BILINEN EKSIKLER / BOZUK OLABILECEKLER
+--------------------------------------
+1) SHADER'LAR: Build'deki shader bytecode'u kaynak shader'a cevrilemez.
+   AssetRipper "Dummy Shader" yer tutuculari koydu. Bazi materyaller
+   Unity'de pembe/mor gorunebilir; o materyallerde shader'i elle
+   Standard veya uygun baska bir shader ile degistirmen gerekir.
+2) SAHNE GUID TEKRARI: UcluGerizekali, VerseneOLM, BayBasliyoruz,
+   YanMonitor, CemaliKuptir, Dalga ve Gomutan sahneleri build'de
+   School sahnesiyle ayni paylasilan asset setini kullandigi icin
+   AssetRipper bunlara EditorBuildSettings'te ayni GUID'i atamis.
+   Unity ikaz verirse bu sahneleri Build Settings'ten kaldirip
+   tekrar surukleyerek ekle, Unity yeni GUID atamaz ama sahne
+   dosyalarinin kendi .meta GUID'leri farklidir, acilista sorun olmaz.
+3) KOD: Scriptler ILSpy ile Assembly-CSharp.dll'den decompile edildi.
+   Degisken isimleri genelde korunmus (orijinal isimler DLL'de vardi),
+   ama yorum satirlari, editor-only kodlar ve bazi ozel isimler
+   orijinaldeki gibi degildir. Derleme hatasi cikarsa cogu genelde
+   kucuk (eksik using, obsolete API) duzeltmelerdir.
+4) TextMeshPro paket olarak degil DLL olarak geldi (Assets/Plugins).
+   Packages/manifest.json'a TMP paketi EKLEME, cakisma cikar.
+5) NavMesh / Lighting verileri elden geldigince kurtarildi ama
+   isiklandirma (lightmap) bazi sahnelerde yeniden bake isteyebilir:
+   Window > Rendering > Lighting > Generate Lighting.
+6) Prefab'lar: Orijinal projede prefab klasor yapisi yoktu, cogu obje
+   sahnelerin icinde gomulu olarak kurtarildi (sadece 3 bagimsiz prefab).
+
+ORIJINAL PROJE ILE FARKI
+-------------------------
+Orijinal .csproj/.sln, .psd/.blend gibi kaynak dosyalar, editore ozgu
+klasor yapisi ve versiyon kontrol gecmisi build'den geri getirilemez.
+Bu paket, build'den uretilebilecek en yakin calisabilir projedir.
+
+KULLANILAN ARACLAR
+-------------------
+AssetRipper 2.0.0 (Export Unity Project, ScriptContentLevel: Level2,
+ScriptExportMode: Hybrid), ILSpy decompiler (AssetRipper icinde).
+
+NOT: Bu oyunun haklari gelistiricisine (BENI OKU.txt: Vacant Guy) aittir.
+Bu geri kazanim sadece inceleme/ogrenme/modlama amacli kullanilmalidir.
