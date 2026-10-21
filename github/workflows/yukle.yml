@@ -1,0 +1,61 @@
+name: Proje Yukle
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Indir, kokekle ve ayarlari duzelt
+        run: |
+          set -e
+          curl -sL --fail --retry 3 -o proj.zip "https://files.catbox.moe/256r2r.zip"
+          unzip -q proj.zip -d _src
+          SRC=""
+          while IFS= read -r -d '' d; do SRC="$(dirname "$d")"; break; done < <(find ./_src -type d -name ProjectSettings -print0)
+          test -n "$SRC"
+          WORK=$(mktemp -d)
+          cp -r "$SRC/Assets" "$WORK/"
+          cp -r "$SRC/ProjectSettings" "$WORK/"
+          cp -r "$SRC/Packages" "$WORK/"
+          sed -i 's/^\([[:space:]]*\)AndroidTargetArchitectures: 0$/\1AndroidTargetArchitectures: 3/' "$WORK/ProjectSettings/ProjectSettings.asset"
+          sed -i 's/^\([[:space:]]*\)scriptingBackend: {}$/\1scriptingBackend:\n\1  Android: 1/' "$WORK/ProjectSettings/ProjectSettings.asset"
+          sed -i 's/^\([[:space:]]*\)AndroidBundleVersionCode: [0-9]*$/\1AndroidBundleVersionCode: 3/' "$WORK/ProjectSettings/ProjectSettings.asset"
+          sed -i 's/^\([[:space:]]*\)bundleVersion: 1.1.0$/\1bundleVersion: 1.2.0/' "$WORK/ProjectSettings/ProjectSettings.asset"
+          RIG="$WORK/Assets/Resources/BaldiMobile/CF2-Rig.prefab"
+          sed -i 's/startFadedOut: 1/startFadedOut: 0/g' "$RIG"
+          sed -i 's/fadeOutWhenReleased: 1/fadeOutWhenReleased: 0/g' "$RIG"
+          sed -i 's/disableWhenTouchScreenInactive: 1/disableWhenTouchScreenInactive: 0/g' "$RIG"
+          sed -i 's/mobileModeRelation: 0/mobileModeRelation: 2/g' "$RIG"
+          sed -i '/--- !u!1 &2189370472960776922/,/^--- / s/m_IsActive: 0/m_IsActive: 1/' "$RIG"
+          sed -i '/--- !u!114 &2608827268978277332/,/^--- / s/m_Enabled: 1/m_Enabled: 0/' "$RIG"
+          sed -i '/--- !u!114 &2608827268978277332/,/^--- / s/m_Color: {r: 1, g: 1, b: 1, a: 1}/m_Color: {r: 1, g: 1, b: 1, a: 0}/' "$RIG"
+          sed -i '/--- !u!114 &2608827268978277332/,/^--- / s/m_RaycastTarget: 1/m_RaycastTarget: 0/' "$RIG"
+          rm -rf ./*
+          cp -r "$WORK/." .
+          rm -rf "$WORK"
+
+      - name: Dogrula
+        run: |
+          set -e
+          grep -A1 "AndroidTargetArchitectures\|scriptingBackend" ProjectSettings/ProjectSettings.asset | head -6
+          grep -q "startFadedOut: 0" "Assets/Resources/BaldiMobile/CF2-Rig.prefab"
+          grep -q "mobileModeRelation: 2" "Assets/Resources/BaldiMobile/CF2-Rig.prefab"
+          sed -n '/--- !u!1 &2189370472960776922/,/^--- /p' "Assets/Resources/BaldiMobile/CF2-Rig.prefab" | grep -q "m_IsActive: 1"
+          sed -n '/--- !u!114 &2608827268978277332/,/^--- /p' "Assets/Resources/BaldiMobile/CF2-Rig.prefab" | grep -q "m_Enabled: 0"
+          grep -q "AndroidBundleVersionCode: 3" ProjectSettings/ProjectSettings.asset
+          grep -q "bundleVersion: 1.2.0" ProjectSettings/ProjectSettings.asset
+          echo "TUM KONTROLLER GECTI"
+
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Mobil ayarlar: IL2CPP, kontroller her zaman acik" || echo "degisiklik yok"
+          git push
